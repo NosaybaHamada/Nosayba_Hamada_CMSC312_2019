@@ -1,0 +1,14 @@
+
+Name: Text2 Processor
+Total runtime: 150
+Memory: 50
+
+CALCULATE 40
+CALCULATE 40
+YIELD 15
+YIELD 3
+CALCULATE 78
+CALCULATE 60
+I/O 10
+OUT 12
+EXE
