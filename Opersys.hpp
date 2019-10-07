@@ -10,6 +10,8 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <queue>
+#include <deque>
 using namespace std;
 
 
@@ -25,33 +27,46 @@ public:
     string name;    // Process Name.
     int runtime;   //  Total Run Time
     int Memory;   //   Memory
-    int cycles;  //    Number od cycles to run the process.     - CALCULATE -
+    int cycles;  //    Number of cycles to run the process.     - CALCULATE -
     int inout;  //     simulator reads in this command.         - I/O -
     int yield; //      pauses the running process               - YIELD -
     int out;  //       print out a message to the screen        - OUT -
     
+    int procNum; //Process Number
+    int BT;     // Burst Time for process
+    
     string processState; // Process State: New, Running, waiting, ready, Terminated.
     
-    processClass();
+     processClass();
+void printProcess();
+    
+    
+};
+
+//Process Scheduler - using round robin
+class scheduler{
+public:
+    
+    queue<processClass> CPU;
+    
+    scheduler();
+    
+    void pushProcess( processClass newProcess);  // Push a new process in queue
+    void popProcess();  //  Pop process out
+    void schedulerFunc();    //Do Scheudling things
+    void processState(processClass process);
     
     
     
 };
 
 
-class scheduler {
-    
-    
-    
-    
-    
-};
 
 
 void openingcommand();
 void printHelp();
-void AddProcess(processClass *newProcess);
-void LoadFile(processClass *newProcess);
+void AddProcess(processClass *newProcess, int processNum);
+void LoadFile(processClass *newProcess, int prcoessNum);
 
 
 

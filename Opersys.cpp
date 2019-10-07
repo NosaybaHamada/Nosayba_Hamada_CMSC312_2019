@@ -15,23 +15,97 @@
 #include <string>
 #include <map>
 #include <utility>
+#include <queue>
+#include <deque>
 #include "Opersys.hpp"
 
 
 using namespace std;
 
-
-    string name;    // Process Name.
-    int runtime;   //  Total Run Time
-    int Memory;   //   Memory
-    int cycles;  //    Number od cycles to run the process.     - CALCULATE -
-    int inout;  //     simulator reads in this command.         - I/O -
-    int yield; //      pauses the running process               - YIELD -
-    int out;  //       print out a message to the screen        - OUT -
-
-    string processState; // Process State: New, Running, waiting, ready, Terminated
     
-    processClass::processClass(){ processState = "NEW"; }
+     processClass::processClass(){ processState = "NEW"; }
+
+void processClass::printProcess(){
+    cout << "Name: " << name << endl << "Process Number: " << procNum << endl <<"Total runtime: " << runtime << endl;
+    cout << "Memory: " << Memory << endl << "Process State: " << processState <<endl;
+    }
+
+
+
+
+
+                                    /*    SCHEDULER CLASS */
+
+     scheduler::scheduler(){ }
+
+void scheduler::pushProcess( processClass newProcess){   CPU.push(newProcess);  }
+void scheduler::popProcess(){ CPU.pop(); }
+void scheduler::processState(processClass process) { string state; }
+
+
+
+void scheduler::schedulerFunc(){
+    
+    int Q = 20; //Quantum
+    size_t size = CPU.size();
+    int currentRunning;
+    processClass currentProcess, tempProcess;
+    bool DONE = true;
+    
+    
+    
+    
+    currentProcess = CPU.front();  // + CHANGE STATE TO READY
+    currentRunning = currentProcess.cycles;
+    
+    //cout << "FIRST: "<<currentProcess.name << endl << "BT: " << currentRunning <<endl;
+    
+    while(DONE){
+        
+        
+    if(CPU.empty()) { cout << endl <<"EMPTY CPU" << endl; DONE = false;}
+    if(!CPU.empty()) {
+        
+        cout << "Currently running: " << currentProcess.name <<endl;
+        
+        for ( int i = 0; i < Q; i++) {
+            currentRunning--;  cout << "processor BT: " << currentRunning << " ";
+            if (currentRunning == 0) break;  /* + CHANGE STATE TO RUN */
+            
+        }
+        
+        if (currentRunning == 0) {
+            popProcess();
+            if (CPU.empty()){DONE = true;}
+            else { currentProcess = CPU.front();} currentRunning = currentProcess.BT;}
+        
+        else {
+        cout << endl << "swaping process" <<endl;
+        tempProcess = CPU.front();
+        tempProcess.BT = currentRunning;
+        popProcess();
+        pushProcess(tempProcess); // + CHANGE STATE TO WAITING
+     
+        currentProcess = CPU.front();
+        currentRunning = currentProcess.BT;
+        //cout << currentProcess.name << endl << "BT: " << currentRunning <<endl;
+        
+            if (currentRunning <= 0) { popProcess(); }
+        }
+    
+    }
+    
+     size = CPU.size();
+    
+    //cout << "SIZE of QUEUE: " <<  size << endl;
+    }
+}
+
+
+
+
+
+
 
 
 
@@ -62,11 +136,13 @@ void printHelp() {
     //exit
     cout << "To exit, type: EXIT" << endl;
     
+    cout << "To view process information, type: print process." <<endl;
+    
 //ADD MORE COMMAND LATER
 
 }
 
-void AddProcess( processClass *newProcess) {
+void AddProcess( processClass *newProcess, int prcoessNum) {
     
     string input;
     bool reading = true;
@@ -80,15 +156,15 @@ void AddProcess( processClass *newProcess) {
     while(reading) {
     cin >> input;
     
-    //Get process Name
-    if (input == "Name"){ cin >> input; newProcess->name = input; cout << newProcess->name << endl; }
-    if (input == "Total runtime") { cin >> input; cin >> input; newProcess->runtime = stoi(input); cout << newProcess->runtime << endl; }
-    if (input == "CALCULATE") { cin >> input; newProcess->cycles = stoi(input); cout << newProcess->cycles << endl; }
-    if (input == "I/O") { cin >> input; newProcess->inout = stoi(input); cout << newProcess->inout << endl; }
-    if (input == "YIELD") { cin >> input; newProcess->yield = stoi(input); cout << newProcess->yield << endl; }
-    if (input == "OUT") { cin >> input; newProcess->out = stoi(input); cout << newProcess->out << endl; }
-    if (input == "Memory") { cin >> input; newProcess->Memory = stoi(input); cout << newProcess->Memory << endl; }
-    if (input == "EXE") { cout << "Loading prcoess into OS" << endl; reading  = false;}
+    
+        if (input == "Name"){ cin >> input; newProcess->name = input; }
+        if (input == "Total runtime") { cin >> input; cin >> input; newProcess->runtime = stoi(input);}
+        if (input == "CALCULATE") { cin >> input; newProcess->cycles = stoi(input); newProcess->BT = stoi(input); }
+        if (input == "I/O") { cin >> input; newProcess->inout = stoi(input); }
+        if (input == "YIELD") { cin >> input; newProcess->yield = stoi(input);}
+        if (input == "OUT") { cin >> input; newProcess->out = stoi(input); }
+        if (input == "Memory") { cin >> input; newProcess->Memory = stoi(input); }
+        if (input == "EXE") { cout << "Loading prcoess into OS. Process Number is: " << prcoessNum << endl; reading  = false;}
     
     //else cout << "TYPE VALID COMMAD" <<endl;
     }
@@ -97,7 +173,7 @@ void AddProcess( processClass *newProcess) {
 
 
 // Load a file to add a new process.
-void LoadFile(processClass *newProcess){
+void LoadFile(processClass *newProcess, int prcoessNum){
     
 string fileName;
 string input;
@@ -116,20 +192,21 @@ bool reading = true;
     fin.open(fileName);
     if(fin.fail()) { cout << "File failed to open." << endl; }
 
+    cout << "LOADING FILE" <<endl;
     
     while (reading) {
         fin >> input;
-        
+        cout << "..." << endl;
        //Get process Name
-        if (input == "Name:"){ getline(fin,input); newProcess->name = input; cout << newProcess->name << endl; }
+        if (input == "Name:"){ getline(fin,input); newProcess->name = input; }
         
-        if (input == "Total") { fin >> input; fin >> input; newProcess->runtime = stoi(input); cout << newProcess->runtime << endl; }
-        if (input == "CALCULATE") { fin >> input; newProcess->cycles = stoi(input); cout << newProcess->cycles << endl; }
-        if (input == "I/O") { fin >> input; newProcess->inout = stoi(input); cout << newProcess->inout << endl; }
-        if (input == "YIELD") { fin >> input; newProcess->yield = stoi(input); cout << newProcess->yield << endl; }
-        if (input == "OUT") { fin >> input; newProcess->out = stoi(input); cout << newProcess->out << endl; }
-        if (input == "Memory:") { fin >> input; newProcess->Memory = stoi(input); cout << newProcess->Memory << endl; }
-        if (input == "EXE") { cout << input << endl; reading = false; }
+            if (input == "Total") { fin >> input; fin >> input; newProcess->runtime = stoi(input); }
+            if (input == "CALCULATE") { fin >> input; newProcess->cycles = stoi(input); newProcess->BT = stoi(input);}
+            if (input == "I/O") { fin >> input; newProcess->inout = stoi(input); }
+            if (input == "YIELD") { fin >> input; newProcess->yield = stoi(input); }
+            if (input == "OUT") { fin >> input; newProcess->out = stoi(input);}
+            if (input == "Memory:") { fin >> input; newProcess->Memory = stoi(input);}
+        if (input == "EXE") { cout << "File loaded successfully, DONE. Process Number is: " << prcoessNum << endl; reading = false; }
         
     }
 }

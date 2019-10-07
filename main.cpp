@@ -11,6 +11,7 @@
 #include <string>
 #include <map>
 #include <utility>
+#include <queue>
 #include "Opersys.hpp"
 using namespace std;
 
@@ -25,10 +26,9 @@ int main(int argc, char* argv[]) {
     bool   running = true;
     int processNum = 0;
     int PN;
-    //typedef map<int , processClass>processMap;
+   
     processClass process[10];
-    
-    
+    scheduler    CPU;
     
 //Greetings
 openingcommand();
@@ -54,30 +54,24 @@ while (running){
     getline(cin,command);
     
     if ((command == "Help") || (command == "HELP") || (command == "help")) {printHelp(); }
-    if ((command == "Add Process") || (command == "add process") || (command == "ADD PROCESS")) { AddProcess( &process[processNum]); processNum++; }
-    // If loading a file, instantiate and object for that process then load file
-    if ((command == "Load File") || (command == "load file") || (command == "LOAD FILE")) { LoadFile( &process[processNum]); processNum++; }
+    
+    if ((command == "Add Process") || (command == "add process") || (command == "ADD PROCESS")) { process[processNum].procNum = processNum;
+        cout << "Process number is: " << processNum << endl; AddProcess( &process[processNum], processNum); CPU.pushProcess( process[processNum]);  processNum++; }
+    
+    
+    if ((command == "Load File") || (command == "load file") || (command == "LOAD FILE")) {  process[processNum].procNum = processNum;
+        LoadFile( &process[processNum], processNum); CPU.pushProcess( process[processNum]);   processNum++;  }
     
     if ((command == "Exit") || (command == "EXIT") || (command == "exit")) {running = false;}
     
-    if (command == "print") {cin >> PN; cout << process[PN].name << "  " << process[PN].Memory <<endl;}
+    if (command == "print process") { cout << "Processor number: " <<endl; cin >> PN; process[PN].printProcess();}
+    
+    if (command == "print Q") { CPU.schedulerFunc();}
     
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+  
         
     }
         
