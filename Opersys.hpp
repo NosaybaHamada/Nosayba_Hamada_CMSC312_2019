@@ -12,6 +12,9 @@
 #include <string>
 #include <queue>
 #include <deque>
+
+#include "Memory.hpp"
+
 using namespace std;
 
 
@@ -65,8 +68,8 @@ public:
 
 void openingcommand();
 void printHelp();
-void AddProcess(processClass *newProcess, int processNum);
-void LoadFile(processClass *newProcess, int prcoessNum);
+void AddProcess(processClass *newProcess, int processNum, MemoryClass *Memory);
+void LoadFile(processClass *newProcess, int prcoessNum, MemoryClass *Memory);
 
 
 

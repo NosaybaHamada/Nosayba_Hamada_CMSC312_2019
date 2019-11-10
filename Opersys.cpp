@@ -18,12 +18,15 @@
 #include <queue>
 #include <deque>
 #include "Opersys.hpp"
+//#include "Memory.hpp"
 
 
 using namespace std;
 
-    
-     processClass::processClass(){ processState = "NEW"; }
+
+
+
+processClass::processClass(){ processState = "NEW"; }
 
 void processClass::printProcess(){
     cout << "Name: " << name << endl << "Process Number: " << procNum << endl <<"Total runtime: " << runtime << endl;
@@ -115,6 +118,15 @@ processMap process;
 
 
 
+
+
+
+
+
+
+
+
+
 void openingcommand(){
 
     cout << "INITIALIZING OPERTING SYSTEM.."<< endl << endl;
@@ -138,14 +150,18 @@ void printHelp() {
     
     cout << "To view process information, type: print process." <<endl;
     
+    cout << "To view CPU, type: print Q." <<endl;
+    
+    cout << "To view Used Memory: View used Memory" << endl;
 //ADD MORE COMMAND LATER
 
 }
 
-void AddProcess( processClass *newProcess, int prcoessNum) {
+void AddProcess( processClass *newProcess, int prcoessNum, MemoryClass *Memory) {
     
     string input;
     bool reading = true;
+    
     
     cout << "To manuly add a process, type:" <<endl;
     cout << "Name: x            -- To add process name"<< endl << "Total runtime: x   -- To add Total run time of process" << endl;
@@ -153,17 +169,19 @@ void AddProcess( processClass *newProcess, int prcoessNum) {
     cout << "I/O: x             -- To add I/O commands" << endl << "YIELD: x           -- To add yield commands" <<endl;
     cout << "OUT: x             -- To add OUT message commands" << endl << "EXE: x             -- To load commands" <<endl;
     
+    
+    
     while(reading) {
     cin >> input;
     
     
-        if (input == "Name"){ cin >> input; newProcess->name = input; }
+        if (input == "Name"){ cin >> input; newProcess->name = input;  }
         if (input == "Total runtime") { cin >> input; cin >> input; newProcess->runtime = stoi(input);}
         if (input == "CALCULATE") { cin >> input; newProcess->cycles = stoi(input); newProcess->BT = stoi(input); }
         if (input == "I/O") { cin >> input; newProcess->inout = stoi(input); }
         if (input == "YIELD") { cin >> input; newProcess->yield = stoi(input);}
         if (input == "OUT") { cin >> input; newProcess->out = stoi(input); }
-        if (input == "Memory") { cin >> input; newProcess->Memory = stoi(input); }
+        if (input == "Memory") { cin >> input; newProcess->Memory = stoi(input); Memory->allocation(stoi(input));  }
         if (input == "EXE") { cout << "Loading prcoess into OS. Process Number is: " << prcoessNum << endl; reading  = false;}
     
     //else cout << "TYPE VALID COMMAD" <<endl;
@@ -173,7 +191,7 @@ void AddProcess( processClass *newProcess, int prcoessNum) {
 
 
 // Load a file to add a new process.
-void LoadFile(processClass *newProcess, int prcoessNum){
+void LoadFile(processClass *newProcess, int prcoessNum, MemoryClass *Memory){
     
 string fileName;
 string input;
@@ -205,7 +223,7 @@ bool reading = true;
             if (input == "I/O") { fin >> input; newProcess->inout = stoi(input); }
             if (input == "YIELD") { fin >> input; newProcess->yield = stoi(input); }
             if (input == "OUT") { fin >> input; newProcess->out = stoi(input);}
-            if (input == "Memory:") { fin >> input; newProcess->Memory = stoi(input);}
+            if (input == "Memory:") { fin >> input; newProcess->Memory = stoi(input); /*if (!Memory->allocation(stoi(input))) { cout << " ERROR: Memory is full" << endl; } */ Memory->allocation(stoi(input));}
         if (input == "EXE") { cout << "File loaded successfully, DONE. Process Number is: " << prcoessNum << endl; reading = false; }
         
     }
